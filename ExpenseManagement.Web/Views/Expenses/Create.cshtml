@@ -1,0 +1,268 @@
+ @model ExpenseManagement.Web.Models.Expense
+
+@{
+    ViewData["Title"] = "Create Expense Claim";
+}
+
+<style>
+    .create-page {
+        max-width: 1000px;
+        margin: 35px auto;
+        padding: 0 15px;
+    }
+
+    .create-hero {
+        background: linear-gradient(135deg, #101b3d, #254a87);
+        color: white;
+        padding: 32px;
+        border-radius: 18px;
+        margin-bottom: 25px;
+        box-shadow: 0 8px 25px rgba(16, 27, 61, 0.15);
+    }
+
+    .create-hero h1 {
+        font-size: 30px;
+        font-weight: 750;
+        margin-bottom: 8px;
+    }
+
+    .create-hero p {
+        margin-bottom: 0;
+        color: #dbeafe;
+    }
+
+    .create-card {
+        background: #ffffff;
+        border: 1px solid #e5eaf2;
+        border-radius: 18px;
+        box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06);
+        overflow: hidden;
+    }
+
+    .form-heading {
+        padding: 24px 30px;
+        border-bottom: 1px solid #e9edf5;
+        background: #f8faff;
+    }
+
+    .form-heading h2 {
+        font-size: 20px;
+        font-weight: 700;
+        color: #172554;
+        margin-bottom: 6px;
+    }
+
+    .form-heading p {
+        color: #64748b;
+        margin-bottom: 0;
+        font-size: 14px;
+    }
+
+    .create-form {
+        padding: 30px;
+    }
+
+    .field-label {
+        color: #334155;
+        font-weight: 650;
+        font-size: 14px;
+        margin-bottom: 9px;
+    }
+
+    .create-form .form-control,
+    .create-form .form-select {
+        min-height: 46px;
+        border: 1px solid #dbe2ed;
+        border-radius: 9px;
+        padding: 11px 13px;
+        color: #1e293b;
+        background-color: #fff;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .create-form textarea.form-control {
+        min-height: 110px;
+        resize: vertical;
+    }
+
+    .create-form .form-control:focus,
+    .create-form .form-select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    }
+
+    .field-hint {
+        display: block;
+        margin-top: 6px;
+        font-size: 12px;
+        color: #64748b;
+    }
+
+    .form-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding-top: 25px;
+        margin-top: 10px;
+        border-top: 1px solid #e9edf5;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: white;
+        border: none;
+        border-radius: 9px;
+        padding: 12px 22px;
+        font-weight: 650;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-submit:hover {
+        background: #1d4ed8;
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 5px 14px rgba(37, 99, 235, 0.22);
+    }
+
+    .btn-cancel {
+        border: 1px solid #dbe2ed;
+        border-radius: 9px;
+        padding: 11px 20px;
+        color: #475569;
+        background: white;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .btn-cancel:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+
+    .validation-summary-errors {
+        padding: 14px 18px;
+        border-radius: 9px;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #b91c1c;
+        margin-bottom: 22px;
+    }
+
+    .validation-summary-errors ul {
+        margin-bottom: 0;
+    }
+
+    @@media (max-width: 576px) {
+        .create-page {
+            margin-top: 20px;
+        }
+
+        .create-hero {
+            padding: 24px 20px;
+        }
+
+        .create-hero h1 {
+            font-size: 25px;
+        }
+
+        .create-form {
+            padding: 20px;
+        }
+
+        .form-heading {
+            padding: 20px;
+        }
+
+        .form-actions .btn {
+            width: 100%;
+            margin-left: 0 !important;
+        }
+    }
+</style>
+
+<div class="create-page">
+    <div class="create-hero">
+        <h1><i class="bi bi-receipt-cutoff me-2"></i>Create Expense Claim</h1>
+        <p>Submit your business expenses for review and reimbursement.</p>
+    </div>
+
+    <div class="create-card">
+        <div class="form-heading">
+            <h2>Expense Details</h2>
+            <p>Fill in all the required information before submitting your claim.</p>
+        </div>
+
+        <form asp-controller="Expenses" asp-action="Create" method="post" class="create-form">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <label asp-for="EmployeeId" class="form-label field-label">Employee ID <span class="text-danger">*</span></label>
+                    <input asp-for="EmployeeId" type="number" class="form-control"
+                           min="1" required placeholder="Enter employee ID" />
+                    <span class="field-hint">Enter your unique employee identification number.</span>
+                    <span asp-validation-for="EmployeeId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="EmployeeName" class="form-label field-label">Employee Name <span class="text-danger">*</span></label>
+                    <input asp-for="EmployeeName" class="form-control"
+                           maxlength="100" required placeholder="Enter full name" />
+                    <span class="field-hint">Enter the employee's full name.</span>
+                    <span asp-validation-for="EmployeeName" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Category" class="form-label field-label">Expense Category <span class="text-danger">*</span></label>
+                    <select asp-for="Category" class="form-select" required>
+                        <option value="">Select a category</option>
+                        <option value="Travel">Travel</option>
+                        <option value="Food">Food</option>
+                        <option value="Accommodation">Accommodation</option>
+                        <option value="Office Supplies">Office Supplies</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <span class="field-hint">Choose the category that best describes your expense.</span>
+                    <span asp-validation-for="Category" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Amount" class="form-label field-label">Amount (₹) <span class="text-danger">*</span></label>
+                    <input asp-for="Amount" type="number" class="form-control"
+                           min="0.01" step="0.01" required placeholder="0.00" />
+                    <span class="field-hint">Enter the amount you want to claim.</span>
+                    <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="ExpenseDate" class="form-label field-label">Expense Date <span class="text-danger">*</span></label>
+                    <input asp-for="ExpenseDate" type="date" class="form-control"
+                           max="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                    <span class="field-hint">Select the date the expense occurred.</span>
+                    <span asp-validation-for="ExpenseDate" class="text-danger"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="Description" class="form-label field-label">Description <span class="text-danger">*</span></label>
+                    <textarea asp-for="Description" class="form-control"
+                              rows="4" maxlength="250" required
+                              placeholder="Explain the purpose of this expense..."></textarea>
+                    <span class="field-hint">Maximum 250 characters. Include the business purpose of the expense.</span>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-submit">
+                    <i class="bi bi-send me-2"></i>Submit Claim
+                </button>
+
+                <a asp-controller="Expenses" asp-action="Index" class="btn btn-cancel">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,643 @@
+
+@using ExpenseManagement.Web.Models
+@model ExpenseManagement.Web.Models.ExpenseSummary
+
+@{
+    ViewData["Title"] = "Expense Dashboard";
+}
+
+<style>
+    .expense-dashboard {
+        --navy: #172554;
+        --blue: #4361ee;
+        --muted: #718096;
+        color: #18243b;
+        padding: 22px 0 35px;
+    }
+
+    .hero-panel {
+        background: linear-gradient(120deg, #172554 0%, #263f86 65%, #4361ee 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 32px;
+        margin-bottom: 28px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 12px 30px rgba(23, 37, 84, .16);
+    }
+
+    .hero-panel:after {
+        content: "";
+        position: absolute;
+        width: 230px;
+        height: 230px;
+        border: 35px solid rgba(255,255,255,.07);
+        border-radius: 50%;
+        right: -55px;
+        top: -105px;
+    }
+
+    .hero-eyebrow {
+        color: #c7d7ff;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+
+    .hero-title {
+        font-size: clamp(25px, 4vw, 34px);
+        font-weight: 750;
+        letter-spacing: -.8px;
+        margin: 0 0 10px;
+    }
+
+    .hero-description {
+        color: #e0e7ff;
+        margin: 0;
+        max-width: 480px;
+        line-height: 1.7;
+    }
+
+    .hero-action {
+        display: inline-block;
+        margin-top: 22px;
+        padding: 12px 18px;
+        border-radius: 10px;
+        background: white;
+        color: #233b82;
+        font-weight: 700;
+        text-decoration: none;
+        position: relative;
+        z-index: 1;
+        transition: .2s ease;
+    }
+
+    .hero-action:hover {
+        background: #eaf0ff;
+        color: #172554;
+        transform: translateY(-2px);
+    }
+
+    .section-label {
+        color: #8792a6;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1.6px;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+    }
+
+    .stat-card {
+        height: 100%;
+        min-height: 174px;
+        padding: 21px;
+        border-radius: 16px;
+        background: #fff;
+        border: 1px solid #e9edf5;
+        box-shadow: 0 5px 18px rgba(23, 37, 84, .045);
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 26px rgba(23, 37, 84, .09);
+    }
+
+    .stat-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 23px;
+    }
+
+    .stat-icon {
+        width: 43px;
+        height: 43px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 21px;
+        font-weight: 700;
+    }
+
+    .stat-tag {
+        font-size: 11px;
+        color: #8994a7;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .6px;
+    }
+
+    .stat-name {
+        color: #718096;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .stat-value {
+        font-size: 33px;
+        line-height: 1.2;
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin: 0;
+        color: #18243b;
+    }
+
+    .stat-total .stat-icon {
+        background: #e8edff;
+        color: #4361ee;
+    }
+
+    .stat-pending .stat-icon {
+        background: #fff2d8;
+        color: #b77908;
+    }
+
+    .stat-approved .stat-icon {
+        background: #ddf8e8;
+        color: #15803d;
+    }
+
+    .stat-rejected .stat-icon {
+        background: #ffe4e6;
+        color: #be123c;
+    }
+
+    .stat-paid .stat-icon {
+        background: #d9f5f7;
+        color: #087e8b;
+    }
+
+    .financial-panel {
+        margin-top: 30px;
+        background: white;
+        border: 1px solid #e9edf5;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 5px 18px rgba(23, 37, 84, .045);
+    }
+
+    .panel-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 24px 26px;
+        border-bottom: 1px solid #edf0f6;
+    }
+
+    .panel-heading h2 {
+        font-size: 19px;
+        font-weight: 800;
+        margin: 0 0 5px;
+        color: #18243b;
+    }
+
+    .panel-heading p {
+        color: #8792a6;
+        font-size: 13px;
+        margin: 0;
+    }
+
+    .live-label {
+        background: #e7f8ed;
+        color: #187744;
+        border-radius: 30px;
+        padding: 7px 12px;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .finance-table {
+        margin: 0;
+    }
+
+    .finance-table thead th {
+        background: #f8faff;
+        color: #8792a6;
+        border-bottom: 1px solid #edf0f6;
+        font-size: 11px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 15px 26px;
+        white-space: nowrap;
+    }
+
+    .finance-table tbody td {
+        padding: 19px 26px;
+        vertical-align: middle;
+        border-color: #f0f2f7;
+        font-size: 14px;
+    }
+
+    .finance-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .finance-table tbody tr:hover {
+        background: #fafbff;
+    }
+
+    .status-name {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        font-weight: 650;
+    }
+
+    .status-symbol {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 35px;
+        height: 35px;
+        border-radius: 10px;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .symbol-approved {
+        background: #e0f8e9;
+        color: #15803d;
+    }
+
+    .symbol-rejected {
+        background: #ffe4e6;
+        color: #be123c;
+    }
+
+    .symbol-paid {
+        background: #d9f5f7;
+        color: #087e8b;
+    }
+
+    .finance-amount {
+        font-size: 15px;
+        font-weight: 800;
+        color: #18243b;
+        white-space: nowrap;
+    }
+
+    .claim-status {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .status-pending {
+        background: #fff2d8;
+        color: #9a6700;
+    }
+
+    .status-approved {
+        background: #ddf8e8;
+        color: #15803d;
+    }
+
+    .status-rejected {
+        background: #ffe4e6;
+        color: #be123c;
+    }
+
+    .status-paid {
+        background: #d9f5f7;
+        color: #087e8b;
+    }
+
+    .view-claim-link {
+        display: inline-block;
+        padding: 8px 12px;
+        border: 1px solid #dce4f5;
+        border-radius: 8px;
+        color: #3455b4;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        background: white;
+        white-space: nowrap;
+    }
+
+    .view-claim-link:hover {
+        background: #edf2ff;
+        color: #233b82;
+    }
+
+    .empty-state {
+        color: #718096;
+        text-align: center;
+        padding: 30px 20px !important;
+    }
+
+    .dashboard-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 24px;
+        color: #8792a6;
+        font-size: 12px;
+    }
+
+    .all-claims-link {
+        display: inline-block;
+        padding: 11px 16px;
+        border: 1px solid #dce4f5;
+        border-radius: 10px;
+        color: #3455b4;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        background: white;
+    }
+
+    .all-claims-link:hover {
+        background: #edf2ff;
+        color: #233b82;
+    }
+
+    @@media (max-width: 576px) {
+        .hero-panel {
+            padding: 24px;
+        }
+
+        .stat-card {
+            min-height: 150px;
+        }
+
+        .stat-value {
+            font-size: 29px;
+        }
+
+        .panel-heading {
+            padding: 20px;
+        }
+
+        .finance-table thead th,
+        .finance-table tbody td {
+            padding: 14px 16px;
+        }
+    }
+</style>
+
+<div class="expense-dashboard">
+
+    <!-- Dashboard heading -->
+    <section class="hero-panel">
+        <div class="hero-eyebrow">Expense Management System</div>
+
+        <h1 class="hero-title">Expense Overview</h1>
+
+        <p class="hero-description">
+            Track employee reimbursement claims, monitor approval progress,
+            and review payment summaries from one place.
+        </p>
+
+        <a asp-controller="Expenses"
+           asp-action="Create"
+           class="hero-action">
+            + &nbsp; Submit New Claim
+        </a>
+    </section>
+
+    <!-- API error message -->
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            @ViewBag.Error
+        </div>
+    }
+
+    <!-- Summary cards -->
+    <div class="section-label">Claims at a glance</div>
+
+    <div class="row g-3">
+
+        <div class="col-12 col-sm-6 col-xl">
+            <div class="stat-card stat-total">
+                <div class="stat-top">
+                    <div class="stat-icon">▤</div>
+                    <span class="stat-tag">All</span>
+                </div>
+                <div class="stat-name">Total Claims</div>
+                <p class="stat-value">@Model.TotalClaims</p>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl">
+            <div class="stat-card stat-pending">
+                <div class="stat-top">
+                    <div class="stat-icon">◷</div>
+                    <span class="stat-tag">Review</span>
+                </div>
+                <div class="stat-name">Pending Claims</div>
+                <p class="stat-value">@Model.PendingClaims</p>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl">
+            <div class="stat-card stat-approved">
+                <div class="stat-top">
+                    <div class="stat-icon">✓</div>
+                    <span class="stat-tag">Accepted</span>
+                </div>
+                <div class="stat-name">Approved Claims</div>
+                <p class="stat-value">@Model.ApprovedClaims</p>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl">
+            <div class="stat-card stat-rejected">
+                <div class="stat-top">
+                    <div class="stat-icon">×</div>
+                    <span class="stat-tag">Declined</span>
+                </div>
+                <div class="stat-name">Rejected Claims</div>
+                <p class="stat-value">@Model.RejectedClaims</p>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl">
+            <div class="stat-card stat-paid">
+                <div class="stat-top">
+                    <div class="stat-icon">₹</div>
+                    <span class="stat-tag">Complete</span>
+                </div>
+                <div class="stat-name">Paid Claims</div>
+                <p class="stat-value">@Model.PaidClaims</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Reimbursement financial summary -->
+    <section class="financial-panel">
+        <div class="panel-heading">
+            <div>
+                <h2>Reimbursement Summary</h2>
+                <p>Financial overview by current claim status</p>
+            </div>
+
+            <span class="live-label">● &nbsp; Summary</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table finance-table">
+                <thead>
+                    <tr>
+                        <th>Claim Status</th>
+                        <th class="text-end">Reimbursement Amount</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="status-name">
+                                <span class="status-symbol symbol-approved">✓</span>
+                                Approved
+                            </div>
+                        </td>
+                        <td class="text-end finance-amount">
+                            ₹@Model.ApprovedAmount.ToString("N2")
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="status-name">
+                                <span class="status-symbol symbol-rejected">×</span>
+                                Rejected
+                            </div>
+                        </td>
+                        <td class="text-end finance-amount">
+                            ₹@Model.RejectedAmount.ToString("N2")
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="status-name">
+                                <span class="status-symbol symbol-paid">₹</span>
+                                Paid
+                            </div>
+                        </td>
+                        <td class="text-end finance-amount">
+                            ₹@Model.PaidAmount.ToString("N2")
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Latest expense claims: required by the practical assessment -->
+    <section class="financial-panel">
+        <div class="panel-heading">
+            <div>
+                <h2>Latest Expense Claims</h2>
+                <p>Recently submitted employee reimbursement claims</p>
+            </div>
+
+            <a asp-controller="Expenses"
+               asp-action="Index"
+               class="all-claims-link">
+                View All Claims &nbsp; →
+            </a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table finance-table">
+                <thead>
+                    <tr>
+                        <th>Claim ID</th>
+                        <th>Employee Name</th>
+                        <th>Category</th>
+                        <th class="text-end">Amount</th>
+                        <th>Expense Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (ViewBag.LatestExpenses is List<Expense> latestExpenses
+                        && latestExpenses.Count > 0)
+                    {
+                        foreach (var expense in latestExpenses)
+                        {
+                            <tr>
+                                <td>@expense.ClaimId</td>
+
+                                <td>@expense.EmployeeName</td>
+
+                                <td>@expense.Category</td>
+
+                                <td class="text-end finance-amount">
+                                    ₹@expense.Amount.ToString("N2")
+                                </td>
+
+                                <td>
+                                    @expense.ExpenseDate.ToString("dd MMM yyyy")
+                                </td>
+
+                                <td>
+                                    <span class="claim-status
+                                        @(expense.Status?.ToLowerInvariant() switch
+                                        {
+                                            "pending" => "status-pending",
+                                            "approved" => "status-approved",
+                                            "rejected" => "status-rejected",
+                                            "paid" => "status-paid",
+                                            _ => ""
+                                        })">
+                                        @expense.Status
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <a asp-controller="Expenses"
+                                       asp-action="Details"
+                                       asp-route-id="@expense.ClaimId"
+                                       class="view-claim-link">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                No expense claims found.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Dashboard footer -->
+    <div class="dashboard-footer">
+        <span>Expense Reimbursement Management</span>
+
+        <a asp-controller="Expenses"
+           asp-action="Index"
+           class="all-claims-link">
+            View All Expense Claims &nbsp; →
+        </a>
+    </div>
+
+</div>

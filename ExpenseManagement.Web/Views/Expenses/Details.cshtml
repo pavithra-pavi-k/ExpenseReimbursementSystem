@@ -1,0 +1,257 @@
+
+@model ExpenseManagement.Web.Models.Expense?
+
+@{
+    ViewData["Title"] = "Claim Details";
+}
+
+<style>
+    .details-page {
+        max-width: 900px;
+        margin: 30px auto;
+        padding: 30px;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+    }
+
+    .details-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 25px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .details-header h2 {
+        margin: 0;
+        color: #172554;
+        font-size: 26px;
+        font-weight: 700;
+    }
+
+    .details-subtitle {
+        margin-top: 7px;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .detail-item {
+        padding: 16px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        min-width: 0;
+    }
+
+    .detail-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .detail-value {
+        color: #1e293b;
+        font-size: 15px;
+        font-weight: 600;
+        overflow-wrap: anywhere;
+    }
+
+    .description-item {
+        grid-column: 1 / -1;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        background: #e2e8f0;
+        color: #334155;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-approved {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-rejected {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-paid {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .details-footer {
+        display: flex;
+        justify-content: flex-start;
+        margin-top: 25px;
+    }
+
+    .back-button {
+        display: inline-block;
+        padding: 11px 18px;
+        border-radius: 8px;
+        background: #1e3a8a;
+        color: #ffffff;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .back-button:hover {
+        background: #1e40af;
+        color: #ffffff;
+    }
+
+    .error-panel {
+        padding: 25px;
+        border: 1px solid #fecaca;
+        border-radius: 10px;
+        background: #fef2f2;
+        color: #991b1b;
+    }
+
+    .error-panel h3 {
+        margin-top: 0;
+    }
+
+    @@media (max-width: 600px) {
+        .details-page {
+            margin: 15px auto;
+            padding: 18px;
+        }
+
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .description-item {
+            grid-column: auto;
+        }
+    }
+</style>
+
+<div class="details-page">
+    @if (Model == null)
+    {
+        <div class="error-panel">
+            <h3>Claim Details Unavailable</h3>
+            <p>
+                @(ViewBag.Error ??
+                    "The requested expense claim could not be found.")
+            </p>
+
+            <a asp-controller="Expenses"
+               asp-action="Index"
+               class="back-button">
+                Back to Expense List
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="details-header">
+            <div>
+                <h2>Expense Claim Details</h2>
+                <div class="details-subtitle">
+                    Complete information for claim #@Model.ClaimId
+                </div>
+            </div>
+
+            <span class="status-badge status-@(
+                (Model.Status ?? "").ToLowerInvariant())">
+                @(Model.Status ?? "Unknown")
+            </span>
+        </div>
+
+        <div class="details-grid">
+            <div class="detail-item">
+                <span class="detail-label">Claim ID</span>
+                <div class="detail-value">@Model.ClaimId</div>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Employee ID</span>
+                <div class="detail-value">@Model.EmployeeId</div>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Employee Name</span>
+                <div class="detail-value">@Model.EmployeeName</div>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Expense Category</span>
+                <div class="detail-value">@Model.Category</div>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Amount</span>
+                <div class="detail-value">
+                    ₹@Model.Amount.ToString("N2")
+                </div>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Expense Date</span>
+                <div class="detail-value">
+                    @Model.ExpenseDate.ToString("dd MMM yyyy")
+                </div>
+            </div>
+
+            <div class="detail-item description-item">
+                <span class="detail-label">Description</span>
+                <div class="detail-value">
+                    @(string.IsNullOrWhiteSpace(Model.Description)
+                        ? "No description provided."
+                        : Model.Description)
+                </div>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Status</span>
+                <div class="detail-value">
+                    @(Model.Status ?? "Unknown")
+                </div>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Created At</span>
+                <div class="detail-value">
+                    @Model.CreatedAt.ToString("dd MMM yyyy, hh:mm tt")
+                </div>
+            </div>
+        </div>
+
+        <div class="details-footer">
+            <a asp-controller="Expenses"
+               asp-action="Index"
+               class="back-button">
+                ← Back to Expense List
+            </a>
+        </div>
+    }
+</div>
